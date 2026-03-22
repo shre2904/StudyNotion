@@ -1,0 +1,59 @@
+# =========================
+# Dependencies
+# =========================
+node_modules/
+server/node_modules/
+
+# =========================
+# Environment Variables
+# =========================
+.env
+.env.*
+server/.env
+server/.env.*
+!.env.example
+!server/.env.example
+
+# =========================
+# Build / Production
+# =========================
+build/
+dist/
+server/build/
+
+# =========================
+# Logs
+# =========================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# OS / System Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# Temporary Files
+# =========================
+tmp/
+temp/
+uploads/
+
+# =========================
+# Testing
+# =========================
+coverage/
+
+# =========================
+# Misc
+# =========================
+.cache/
