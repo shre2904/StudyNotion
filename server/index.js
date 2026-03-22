@@ -24,7 +24,7 @@ database.connect();
 app.use(
   fileUpload({
     useTempFiles: true,
-    tempFileDir: "C:/tmp/",   // Windows path
+    tempFileDir: "/tmp/",   // Windows path
     createParentPath: true,
     limits: { fileSize: 100 * 1024 * 1024 }, // optional but good
   })
@@ -33,7 +33,7 @@ app.use(
 app.use(cookieParser());
 app.use(
 	cors({
-  origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
+  origin: "*",
   credentials: true,
 })
 
