@@ -15,7 +15,7 @@ const mailSender = async (email, title, body) => {
     console.log("Mail server is ready");
 
             const info = await transporter.sendMail({
-                from: process.env.MAIL_FROM_NAME || process.env.APP_NAME || "Studynotion",
+                from: `"StudyNotion" <${process.env.MAIL_USER}>`,
                 to:`${email}`,
                 subject: `${title}`,
                 html: `${body}`,
