@@ -235,47 +235,63 @@ exports.login = async (req, res) => {
 
 exports.sendotp = async (req, res) => {
   try {
+    console.log(" OTP API HIT");
+
     let { email } = req.body;
     email = email?.trim().toLowerCase();
 
+    console.log(" Email received:", email);
+
+    // Check if user already exists
     const checkUserPresent = await User.findOne({ email });
 
     if (checkUserPresent) {
+      console.log(" User already registered:", email);
       return res.status(401).json({
         success: false,
         message: `User is Already Registered`,
       });
     }
 
+    // Generate OTP
     let otp = otpGenerator.generate(6, {
       upperCaseAlphabets: false,
       lowerCaseAlphabets: false,
       specialChars: false,
     });
 
+    console.log(" Generated OTP:", otp);
+
+    // Ensure unique OTP
     let result = await OTP.findOne({ otp });
 
     while (result) {
+      console.log(" Duplicate OTP found, regenerating...");
       otp = otpGenerator.generate(6, {
         upperCaseAlphabets: false,
       });
       result = await OTP.findOne({ otp });
     }
 
-    // Save OTP
+    // Save OTP to DB
+    console.log(" Saving OTP to DB...");
     await OTP.create({ email, otp });
+    console.log(" OTP saved successfully");
 
-    // SEND EMAIL (NO AWAIT → FAST RESPONSE)
+    // Send Email (non-blocking)
+    console.log(" Calling mailSender...");
     mailSender(email, "Verification Email", otpTemplate(otp));
 
-    //  Send response immediately
+    console.log(" Response sent to frontend");
+
+    // Send response immediately
     return res.status(200).json({
       success: true,
       message: "OTP Sent Successfully",
     });
 
   } catch (error) {
-    console.log(error.message);
+    console.error(" OTP ERROR:", error);
     return res.status(500).json({
       success: false,
       error: error.message,
