@@ -6,6 +6,7 @@ const otpGenerator = require("otp-generator")
 const mailSender = require("../utils/mailSender")
 const { passwordUpdated } = require("../mail/templates/passwordUpdate")
 const Profile = require("../models/Profile")
+const otpTemplate = require("../mail/templates/emailVerificationTemplate")
 require("dotenv").config()
 
 // Signup Controller for Registering USers
@@ -185,52 +186,102 @@ exports.login = async (req, res) => {
   }
 }
 // Send OTP For Email Verification
+// exports.sendotp = async (req, res) => {
+//   try {
+//     let { email } = req.body
+//     email = email?.trim().toLowerCase()
+
+//     // Check if user is already present
+//     // Find user with provided email
+//     const checkUserPresent = await User.findOne({ email })
+//     // to be used in case of signup
+
+//     // If user found with provided email
+//     if (checkUserPresent) {
+//       // Return 401 Unauthorized status code with error message
+//       return res.status(401).json({
+//         success: false,
+//         message: `User is Already Registered`,
+//       })
+//     }
+
+//     var otp = otpGenerator.generate(6, {
+//       upperCaseAlphabets: false,
+//       lowerCaseAlphabets: false,
+//       specialChars: false,
+//     })
+//     const result = await OTP.findOne({ otp: otp })
+//     console.log("Result is Generate OTP Func")
+//     console.log("OTP", otp)
+//     console.log("Result", result)
+//     while (result) {
+//       otp = otpGenerator.generate(6, {
+//         upperCaseAlphabets: false,
+//       })
+//     }
+//     const otpPayload = { email, otp }
+//     const otpBody = await OTP.create(otpPayload)
+//     console.log("OTP Body", otpBody)
+//     res.status(200).json({
+//       success: true,
+//       message: `OTP Sent Successfully`,
+      
+//     })
+//   } catch (error) {
+//     console.log(error.message)
+//     return res.status(500).json({ success: false, error: error.message })
+//   }
+// }
+
 exports.sendotp = async (req, res) => {
   try {
-    let { email } = req.body
-    email = email?.trim().toLowerCase()
+    let { email } = req.body;
+    email = email?.trim().toLowerCase();
 
-    // Check if user is already present
-    // Find user with provided email
-    const checkUserPresent = await User.findOne({ email })
-    // to be used in case of signup
+    const checkUserPresent = await User.findOne({ email });
 
-    // If user found with provided email
     if (checkUserPresent) {
-      // Return 401 Unauthorized status code with error message
       return res.status(401).json({
         success: false,
         message: `User is Already Registered`,
-      })
+      });
     }
 
-    var otp = otpGenerator.generate(6, {
+    let otp = otpGenerator.generate(6, {
       upperCaseAlphabets: false,
       lowerCaseAlphabets: false,
       specialChars: false,
-    })
-    const result = await OTP.findOne({ otp: otp })
-    console.log("Result is Generate OTP Func")
-    console.log("OTP", otp)
-    console.log("Result", result)
+    });
+
+    let result = await OTP.findOne({ otp });
+
     while (result) {
       otp = otpGenerator.generate(6, {
         upperCaseAlphabets: false,
-      })
+      });
+      result = await OTP.findOne({ otp });
     }
-    const otpPayload = { email, otp }
-    const otpBody = await OTP.create(otpPayload)
-    console.log("OTP Body", otpBody)
-    res.status(200).json({
+
+    // Save OTP
+    await OTP.create({ email, otp });
+
+    // SEND EMAIL (NO AWAIT → FAST RESPONSE)
+    mailSender(email, "Verification Email", otpTemplate(otp));
+
+    //  Send response immediately
+    return res.status(200).json({
       success: true,
-      message: `OTP Sent Successfully`,
-      otp,
-    })
+      message: "OTP Sent Successfully",
+    });
+
   } catch (error) {
-    console.log(error.message)
-    return res.status(500).json({ success: false, error: error.message })
+    console.log(error.message);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
   }
-}
+};
 
 // Controller for Changing Password
 exports.changePassword = async (req, res) => {

@@ -33,14 +33,14 @@ async function sendVerificationEmail(email, otp) {
   }
 }
 
-// Send email AFTER OTP is saved
-OTPSchema.post("save", async function (doc) {
-  console.log("New OTP document saved");
+//  Send email AFTER OTP is saved
+//  OTPSchema.post("save", async function (doc) {
+//    console.log("New OTP document saved");
 
-  if (doc) {
-    await sendVerificationEmail(doc.email, doc.otp);
-  }
-});
+//    if (doc) {
+//     await sendVerificationEmail(doc.email, doc.otp);
+//    }
+// });
 
 const OTP = mongoose.model("OTP", OTPSchema);
 module.exports = OTP;
