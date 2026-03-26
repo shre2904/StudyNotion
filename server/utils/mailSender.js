@@ -6,7 +6,7 @@ const mailSender = async (email, title, body) => {
     try{
         console.log(" Creating transporter...");
              const transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,      // smtp.gmail.com
+      host: "smtp-relay.brevo.com",      // smtp.gmail.com
       port: 587,                        // REQUIRED
       secure: false,                    // true for 465, false for 587
       auth: {
@@ -14,17 +14,17 @@ const mailSender = async (email, title, body) => {
         pass: process.env.MAIL_PASS,    // App Password
       },
     });
-    console.log(" Verifying transporter...");
-    await transporter.verify();
-    console.log("Mail server is ready");
-    console.log(" Sending email to:", email);
+    // console.log(" Verifying transporter...");
+    // await transporter.verify();
+    // console.log("Mail server is ready");
+    // console.log(" Sending email to:", email);
             const info = await transporter.sendMail({
                 from: `"StudyNotion" <${process.env.MAIL_USER}>`,
                 to:`${email}`,
                 subject: `${title}`,
                 html: `${body}`,
             })
-            cconsole.log(" Email sent successfully");
+            console.log(" Email sent successfully");
             console.log(" Response:", info.response);
             return info;
     }
