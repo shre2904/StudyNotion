@@ -363,3 +363,40 @@ exports.changePassword = async (req, res) => {
     })
   }
 }
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    console.log("🔍 Verifying OTP for:", email);
+
+    // Get latest OTP
+    const recentOtp = await OTP.findOne({ email })
+      .sort({ createdAt: -1 });
+
+    if (!recentOtp) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP not found",
+      });
+    }
+
+    if (recentOtp.otp !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP Verified Successfully",
+    });
+
+  } catch (error) {
+    console.error("❌ Verify OTP Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error verifying OTP",
+    });
+  }
+};
