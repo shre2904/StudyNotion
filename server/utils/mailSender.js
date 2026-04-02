@@ -1,25 +1,24 @@
 const https = require('https');
 
 const mailSender = async (email, title, body) => {
-    console.log("mailSender function triggered connecting to Brevo API");
+    console.log("mailSender function triggered connecting to SendGrid API");
 
     return new Promise((resolve, reject) => {
         const payload = JSON.stringify({
-            sender: { email: process.env.MAIL_USER, name: "StudyNotion" },
-            to: [{ email: email }],
+            personalizations: [{ to: [{ email: email }] }],
+            from: { email: process.env.MAIL_USER, name: "StudyNotion" },
             subject: title,
-            htmlContent: body
+            content: [{ type: "text/html", value: body }]
         });
 
         const options = {
-            hostname: 'api.brevo.com',
-            path: '/v3/smtp/email',
+            hostname: 'api.sendgrid.com',
+            path: '/v3/mail/send',
             method: 'POST',
             headers: {
-                'accept': 'application/json',
-                'api-key': process.env.MAIL_PASS, // Brevo uses the same pass for SMTP and API v3
-                'content-type': 'application/json',
-                'content-length': Buffer.byteLength(payload)
+                'Authorization': `Bearer ${process.env.MAIL_PASS}`,
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(payload)
             }
         };
 
@@ -31,16 +30,13 @@ const mailSender = async (email, title, body) => {
             });
 
             res.on('end', () => {
+                // SendGrid returns 202 Accepted on success
                 if (res.statusCode >= 200 && res.statusCode < 300) {
-                    console.log("Email sent successfully via Brevo API");
-                    try {
-                        resolve(JSON.parse(data));
-                    } catch(e) {
-                        resolve(data);
-                    }
+                    console.log("Email sent successfully via SendGrid API");
+                    resolve({ success: true, status: res.statusCode });
                 } else {
-                    console.error("Brevo API Error:", data);
-                    reject(new Error(`Brevo API Error (${res.statusCode}): ${data}`));
+                    console.error("SendGrid API Error:", data);
+                    reject(new Error(`SendGrid API Error (${res.statusCode}): ${data}`));
                 }
             });
         });
