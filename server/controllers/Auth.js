@@ -278,9 +278,9 @@ exports.sendotp = async (req, res) => {
     await OTP.create({ email, otp });
     console.log(" OTP saved successfully");
 
-    // Send Email (non-blocking)
+    // Send Email (blocking)
     console.log(" Calling mailSender...");
-    mailSender(email, "Verification Email", otpTemplate(otp));
+    await mailSender(email, "Verification Email", otpTemplate(otp));
 
     console.log(" Response sent to frontend");
 

@@ -30,6 +30,7 @@ const mailSender = async (email, title, body) => {
     }
     catch(error) {
         console.error(" Mail Error:", error);
+        throw error;
     }
 }
 
