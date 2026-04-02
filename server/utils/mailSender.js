@@ -1,38 +1,58 @@
-const nodemailer = require("nodemailer");
+const https = require('https');
 
 const mailSender = async (email, title, body) => {
-    console.log(" mailSender function triggered");
+    console.log("mailSender function triggered connecting to Brevo API");
 
-    try{
-        console.log(" Creating transporter...");
-             const transporter = nodemailer.createTransport({
-      host: "smtp-relay.brevo.com",      // smtp.gmail.com
-      port: 587,                        // REQUIRED
-      secure: false,                    // true for 465, false for 587
-      auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,    // App Password
-      },
+    return new Promise((resolve, reject) => {
+        const payload = JSON.stringify({
+            sender: { email: process.env.MAIL_USER, name: "StudyNotion" },
+            to: [{ email: email }],
+            subject: title,
+            htmlContent: body
+        });
+
+        const options = {
+            hostname: 'api.brevo.com',
+            path: '/v3/smtp/email',
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'api-key': process.env.MAIL_PASS, // Brevo uses the same pass for SMTP and API v3
+                'content-type': 'application/json',
+                'content-length': Buffer.byteLength(payload)
+            }
+        };
+
+        const req = https.request(options, (res) => {
+            let data = '';
+
+            res.on('data', (chunk) => {
+                data += chunk;
+            });
+
+            res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    console.log("Email sent successfully via Brevo API");
+                    try {
+                        resolve(JSON.parse(data));
+                    } catch(e) {
+                        resolve(data);
+                    }
+                } else {
+                    console.error("Brevo API Error:", data);
+                    reject(new Error(`Brevo API Error (${res.statusCode}): ${data}`));
+                }
+            });
+        });
+
+        req.on('error', (error) => {
+            console.error("Mail Request Error:", error);
+            reject(error);
+        });
+
+        req.write(payload);
+        req.end();
     });
-    // console.log(" Verifying transporter...");
-    // await transporter.verify();
-    // console.log("Mail server is ready");
-    // console.log(" Sending email to:", email);
-            const info = await transporter.sendMail({
-                from: `"StudyNotion" <${process.env.MAIL_USER}>`,
-                to:`${email}`,
-                subject: `${title}`,
-                html: `${body}`,
-            })
-            console.log(" Email sent successfully");
-            console.log(" Response:", info.response);
-            return info;
-    }
-    catch(error) {
-        console.error(" Mail Error:", error);
-        throw error;
-    }
-}
-
+};
 
 module.exports = mailSender;
