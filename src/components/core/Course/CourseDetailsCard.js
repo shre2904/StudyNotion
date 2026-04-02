@@ -70,16 +70,16 @@ function CourseDetailsCard({ course, setConfirmationModal, handleBuyCourse }) {
               onClick={
                 user && course?.studentsEnrolled.includes(user?._id)
                   ? () => navigate("/dashboard/enrolled-courses")
-                  : handleBuyCourse
+                  : handleAddToCart
               }
             >
               {user && course?.studentsEnrolled.includes(user?._id)
                 ? "Go To Course"
-                : "Buy Now"}
+                : "Add to Cart"}
             </button>
             {(!user || !course?.studentsEnrolled.includes(user?._id)) && (
-              <button onClick={handleAddToCart} className="blackButton">
-                Add to Cart
+              <button onClick={handleBuyCourse} className="blackButton">
+                Buy Now
               </button>
             )}
           </div>

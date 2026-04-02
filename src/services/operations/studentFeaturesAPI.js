@@ -99,7 +99,7 @@ const options = {
             throw new Error(response.data.message);
         }
         toast.success("payment successfull,you are added to the course ")
-        navigate("/dashboard/enrolled-course");
+        navigate("/dashboard/enrolled-courses");
         dispatch(resetCart());
     } catch (error) {
         console.log("Payment verify error",error);

@@ -10,6 +10,7 @@ import Footer from "../components/common/Footer"
 import RatingStars from "../components/common/RatingStars"
 import CourseAccordionBar from "../components/core/Course/CourseAccordionBar"
 import CourseDetailsCard from "../components/core/Course/CourseDetailsCard"
+import ReviewSlider from "../components/common/ReviewSlider"
 import { formatDate } from "../services/formatDate"
 import { fetchCourseDetails } from "../services/operations/courseDetailsAPI"
 import { buyCourse } from "../services/operations/studentFeaturesAPI"
@@ -99,6 +100,7 @@ function CourseDetails() {
     instructor,
     studentsEnrolled,
     createdAt,
+    category,
   } = response.data?.courseDetails
 
   const handleBuyCourse = () => {
@@ -142,6 +144,10 @@ function CourseDetails() {
             <div
               className={`z-30 my-5 flex flex-col justify-center gap-4 py-5 text-lg text-richblack-5`}
             >
+              <p className="text-sm text-richblack-300">
+                Home / Learning /{" "}
+                <span className="text-yellow-25">{category?.name}</span>
+              </p>
               <div>
                 <p className="text-4xl font-bold text-richblack-5 sm:text-[42px]">
                   {courseName}
@@ -259,6 +265,17 @@ function CourseDetails() {
           </div>
         </div>
       </div>
+      
+      {/* Reviews Section */}
+      <div className="mx-auto box-content px-4 text-start text-richblack-5 lg:w-[1260px]">
+        <div className="mx-auto max-w-maxContentTab lg:mx-0 xl:max-w-[810px]">
+          <h2 className="text-center text-3xl font-semibold mt-8 mb-4">
+            Reviews from other learners
+          </h2>
+          <ReviewSlider />
+        </div>
+      </div>
+      
       <Footer />
       {confirmationModal && <ConfirmationModal modalData={confirmationModal} />}
     </>
