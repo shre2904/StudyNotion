@@ -173,6 +173,7 @@ exports.editCourse = async (req, res) => {
     })
       .populate({
         path: "instructor",
+        select: "-password -token -resetPasswordExpires",
         populate: {
           path: "additionalDetails",
         },
@@ -215,7 +216,10 @@ exports.getAllCourses = async (req, res) => {
         studentsEnrolled: true,
       }
     )
-      .populate("instructor")
+      .populate({
+        path: "instructor",
+        select: "-password -token -resetPasswordExpires",
+      })
       .exec()
 
     return res.status(200).json({
@@ -291,6 +295,7 @@ exports.getCourseDetails = async (req, res) => {
     })
       .populate({
         path: "instructor",
+        select: "-password -token -resetPasswordExpires",
         populate: {
           path: "additionalDetails",
         },
@@ -353,6 +358,7 @@ exports.getFullCourseDetails = async (req, res) => {
     })
       .populate({
         path: "instructor",
+        select: "-password -token -resetPasswordExpires",
         populate: {
           path: "additionalDetails",
         },

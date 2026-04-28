@@ -98,7 +98,8 @@ exports.categoryPageDetails = async (req, res) => {
           match: { status: "Published" },
           populate: {
             path: "instructor",
-        },
+            select: "-password -token -resetPasswordExpires",
+          },
         })
         .exec()
       const allCourses = allCategories.flatMap((category) => category.courses)
